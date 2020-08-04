@@ -70,7 +70,7 @@ You can start using it without bundlers or compilers.
 You can use npm or yarn to install it.
 
 ```console
-npm install h-h
+npm install git+https://github.com/gc-victor/h-h.git#master
 ```
 
 Import it in your application.
