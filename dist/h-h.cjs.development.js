@@ -118,7 +118,9 @@ notificationsIDom.nodesCreated = function (nodes) {
 };
 
 var handlersCache = /*#__PURE__*/new WeakMap();
-var eventTypes = /*#__PURE__*/new Map();
+var eventTypes = /*#__PURE__*/new Map(); // @see: https://github.com/preactjs/preact/blob/87202bd7dbcb5b94506f9388516a9c4bd289129a/compat/src/render.js#L10
+
+var CAMEL_PROPS = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|fill|flood|font|glyph(?!R)|horiz|marker(?!H|W|U)|overline|paint|stop|strikethrough|stroke|text(?!L)|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/;
 function h(tagName, attributes, children) {
   var attrs = attributes || {};
   var outerArgs = arguments;
@@ -201,12 +203,10 @@ function setAttributes(_ref) {
 
     if (name && !isEvent(name) && !isSkip(name) && !isRef(name)) {
       var classProp = name === 'className' ? 'class' : '';
-      var forProp = name === 'htmlFor' ? 'for' : ''; // @see: https://github.com/shahata/dasherize/blob/master/index.js#L26
+      var forProp = name === 'htmlFor' ? 'for' : ''; // @see: https://github.com/preactjs/preact/blob/87202bd7dbcb5b94506f9388516a9c4bd289129a/compat/src/render.js#L149
 
-      var hyphenated = name.replace(/[A-Z](?:(?=[^A-Z])|[A-Z]*(?=[A-Z][^A-Z]|$))/g, function (s, j) {
-        return (j > 0 ? '-' : '') + s.toLowerCase();
-      });
-      attrIDom(forProp || classProp || hyphenated, attributes[name]);
+      var hyphenated = CAMEL_PROPS.test(name) && name.replace(/[A-Z0-9]/, '-$&').toLowerCase();
+      attrIDom(forProp || classProp || hyphenated || name, attributes[name]);
     }
   }
 }

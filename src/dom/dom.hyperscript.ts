@@ -10,6 +10,8 @@ import { HTMLElements, HTMLElementsAttributes, HyperScriptNode } from './dom.typ
 
 const handlersCache = new WeakMap();
 const eventTypes = new Map();
+// @see: https://github.com/preactjs/preact/blob/87202bd7dbcb5b94506f9388516a9c4bd289129a/compat/src/render.js#L10
+const CAMEL_PROPS = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|fill|flood|font|glyph(?!R)|horiz|marker(?!H|W|U)|overline|paint|stop|strikethrough|stroke|text(?!L)|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/;
 
 export function h<T extends HTMLElements>(
     tagName: T,
@@ -98,15 +100,11 @@ function setAttributes({
         if (name && !isEvent(name) && !isSkip(name) && !isRef(name)) {
             const classProp = name === 'className' ? 'class' : '';
             const forProp = name === 'htmlFor' ? 'for' : '';
-            // @see: https://github.com/shahata/dasherize/blob/master/index.js#L26
-            const hyphenated = name.replace(
-                /[A-Z](?:(?=[^A-Z])|[A-Z]*(?=[A-Z][^A-Z]|$))/g,
-                function (s: string, j: number) {
-                    return (j > 0 ? '-' : '') + s.toLowerCase();
-                }
-            );
+            // @see: https://github.com/preactjs/preact/blob/87202bd7dbcb5b94506f9388516a9c4bd289129a/compat/src/render.js#L149
+            const hyphenated =
+                CAMEL_PROPS.test(name) && name.replace(/[A-Z0-9]/, '-$&').toLowerCase();
 
-            attrIDom(forProp || classProp || hyphenated, attributes[name]);
+            attrIDom(forProp || classProp || hyphenated || name, attributes[name]);
         }
     }
 }
