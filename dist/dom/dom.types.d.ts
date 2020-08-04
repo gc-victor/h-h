@@ -12,6 +12,9 @@ export declare type HTMLElementsAttributes = IntrinsicElements;
 export interface HyperScriptNode extends Node {
     _elementAttached: Function;
     _elementDetached: Function;
+    _listeners: {
+        [key: string]: any;
+    };
 }
 declare type Defaultize<Props, Defaults> = Props extends any ? Partial<Pick<Props, Extract<keyof Props, keyof Defaults>>> & Pick<Props, Exclude<keyof Props, keyof Defaults>> : never;
 export declare type LibraryManagedAttributes<Component, Props> = Component extends {

@@ -14,6 +14,7 @@ export type HTMLElementsAttributes = IntrinsicElements;
 export interface HyperScriptNode extends Node {
     _elementAttached: Function;
     _elementDetached: Function;
+    _listeners: { [key: string]: any };
 }
 
 // @see: https://github.com/preactjs/preact/blob/master/src/jsx.d.ts

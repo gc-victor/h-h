@@ -8,8 +8,6 @@ import {
 } from './dom.incremental-dom';
 import { HTMLElements, HTMLElementsAttributes, HyperScriptNode } from './dom.types';
 
-const handlersCache = new WeakMap();
-const eventTypes = new Map();
 // @see: https://github.com/preactjs/preact/blob/87202bd7dbcb5b94506f9388516a9c4bd289129a/compat/src/render.js#L10
 const CAMEL_PROPS = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|fill|flood|font|glyph(?!R)|horiz|marker(?!H|W|U)|overline|paint|stop|strikethrough|stroke|text(?!L)|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/;
 
@@ -125,26 +123,20 @@ function setEvents({
 
         if (name && isEvent(name)) {
             const eventName = name.toLowerCase().substring(2);
-            const handlers = handlersCache.get(element) || {};
 
-            if (!eventTypes.has(eventName)) {
-                document.body.addEventListener(eventName, eventProxy, false);
+            element._listeners = element._listeners || {};
+
+            if (!element._listeners[eventName]) {
+                element.addEventListener(eventName, eventProxy, false);
             }
 
-            eventTypes.set(eventName, 1);
-            handlersCache.set(element, { ...handlers, [eventName]: attributes[name] });
+            element._listeners[eventName] = attributes[name];
         }
     }
 }
 
 function eventProxy(event: Event) {
-    const element = event.target as any;
-    const handlers = handlersCache.get(element) || {};
-    const type = event.type;
-
-    if (handlers[type]) {
-        return handlers[type](event);
-    }
+    return (event.currentTarget as HyperScriptNode)._listeners[event.type](event);
 }
 
 function forEachChildInArgs(args: IArguments, iteratee: Function) {

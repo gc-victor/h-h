@@ -2,24 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
 // https://github.com/staltz/quicktask/blob/master/index.ts
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/queueMicrotask#When_queueMicrotask_isnt_available
 // https://morioh.com/p/4ca3c63dbc0c
@@ -116,9 +98,6 @@ notificationsIDom.nodesCreated = function (nodes) {
     return node && node._elementAttached && schedule(node._elementAttached);
   });
 };
-
-var handlersCache = /*#__PURE__*/new WeakMap();
-var eventTypes = /*#__PURE__*/new Map(); // @see: https://github.com/preactjs/preact/blob/87202bd7dbcb5b94506f9388516a9c4bd289129a/compat/src/render.js#L10
 
 var CAMEL_PROPS = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|fill|flood|font|glyph(?!R)|horiz|marker(?!H|W|U)|overline|paint|stop|strikethrough|stroke|text(?!L)|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/;
 function h(tagName, attributes, children) {
@@ -221,29 +200,20 @@ function setEvents(_ref2) {
     var name = names[i];
 
     if (name && isEvent(name)) {
-      var _extends2;
-
       var eventName = name.toLowerCase().substring(2);
-      var handlers = handlersCache.get(element) || {};
+      element._listeners = element._listeners || {};
 
-      if (!eventTypes.has(eventName)) {
-        document.body.addEventListener(eventName, eventProxy, false);
+      if (!element._listeners[eventName]) {
+        element.addEventListener(eventName, eventProxy, false);
       }
 
-      eventTypes.set(eventName, 1);
-      handlersCache.set(element, _extends(_extends({}, handlers), {}, (_extends2 = {}, _extends2[eventName] = attributes[name], _extends2)));
+      element._listeners[eventName] = attributes[name];
     }
   }
 }
 
 function eventProxy(event) {
-  var element = event.target;
-  var handlers = handlersCache.get(element) || {};
-  var type = event.type;
-
-  if (handlers[type]) {
-    return handlers[type](event);
-  }
+  return event.currentTarget._listeners[event.type](event);
 }
 
 function forEachChildInArgs(args, iteratee) {
