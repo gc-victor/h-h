@@ -208,7 +208,7 @@ const todo = component(({ created, deleted, execute, key, props, update }) => {
 ```
 
 -   **update**: as the useState from React is in charge of managing a state. It returns an array, where the first item is the current state, and the second is the setter.
--   **effect**: as the useEffect from React is the main way to trigger various side-effects.
+-   **execute**: as the useEffect from React is the main way to trigger various side-effects.
 -   **created**: is triggered when the component is created in the DOM, close to componentDidMount.
 -   **deleted**: is triggered when the component is deleted from the DOM, close to componentWillUnMount.
 
