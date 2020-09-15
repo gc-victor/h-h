@@ -31,7 +31,7 @@ export const redirect = (href: string) => {
     setClick(link);
 };
 export const to = (event: Event) => {
-    const link = event.target as HTMLAnchorElement;
+    const link = event.currentTarget as HTMLAnchorElement;
 
     event.preventDefault();
 

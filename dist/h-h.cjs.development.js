@@ -254,7 +254,7 @@ var redirect = function redirect(href) {
   setClick(link);
 };
 var to = function to(event) {
-  var link = event.target;
+  var link = event.currentTarget;
   event.preventDefault();
   setClick(link);
 };
