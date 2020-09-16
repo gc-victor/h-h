@@ -49,13 +49,12 @@ const initClick = (options: RouterOptions) => (link: HTMLAnchorElement) => {
 };
 
 export function router(options: RouterOptions) {
-    const path = root.location.pathname;
-    const match = matcher.set(options, path);
+    const match = matcher.set(options, root.location.pathname);
 
     setClick = initClick(options);
 
     popState(options);
-    setTitle({ match, path, isPopState: false });
+    setTitle({ match, path: setPath(root.location), isPopState: false });
 
     return {
         view: match.view || options.view,
@@ -68,20 +67,23 @@ function popState(options: RouterOptions) {
 
 function render({ options, event }: { options: RouterOptions; event: Event }): void {
     const target = event.currentTarget as HTMLAnchorElement;
-    const path = target.pathname || root.location.pathname;
-    const match = matcher.set(options, path);
+    const match = matcher.set(options, root.location.pathname);
 
     event.preventDefault();
 
     setTitle({
         match,
-        path,
+        path: setPath(target) || setPath(location),
         isPopState: event.type === 'popstate',
     });
     patch(
         document.getElementById(options.routerId || options.id || APP_ID) as Element,
         match.view()
     );
+}
+
+function setPath(location: { hash: string; pathname: string; search: string }) {
+    return location.pathname + (location.search || location.hash);
 }
 
 function setTitle({

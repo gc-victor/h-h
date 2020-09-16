@@ -275,13 +275,12 @@ var initClick = function initClick(options) {
 };
 
 function router(options) {
-  var path = root.location.pathname;
-  var match = matcher.set(options, path);
+  var match = matcher.set(options, root.location.pathname);
   setClick = initClick(options);
   popState(options);
   setTitle({
     match: match,
-    path: path,
+    path: setPath(root.location),
     isPopState: false
   });
   return {
@@ -302,15 +301,18 @@ function render(_ref2) {
   var options = _ref2.options,
       event = _ref2.event;
   var target = event.currentTarget;
-  var path = target.pathname || root.location.pathname;
-  var match = matcher.set(options, path);
+  var match = matcher.set(options, root.location.pathname);
   event.preventDefault();
   setTitle({
     match: match,
-    path: path,
+    path: setPath(target) || setPath(location),
     isPopState: event.type === 'popstate'
   });
   patch(document.getElementById(options.routerId || options.id || APP_ID), match.view());
+}
+
+function setPath(location) {
+  return location.pathname + (location.search || location.hash);
 }
 
 function setTitle(_ref3) {

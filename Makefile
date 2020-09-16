@@ -23,7 +23,7 @@ precommit: lint format
 static : ## Run a static site generator example
 	node -r esm examples/static.js; \
 
-watch : ## Execute dist and watch
+watch : build ## Execute dist and watch
 	npx tsdx watch --format cjs,esm,umd --name h-h ; \
 
 # catch anything and do nothing
