@@ -73,7 +73,7 @@ function render({ options, event }: { options: RouterOptions; event: Event }): v
 
     setTitle({
         match,
-        path: setPath(target) || setPath(location),
+        path: setPath(target) || setPath(root.location),
         isPopState: event.type === 'popstate',
     });
     patch(
