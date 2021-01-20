@@ -79,10 +79,6 @@ attributesIDom.value = function (el, _name, value) {
   return el.value = value === null || typeof value === 'undefined' ? '' : value;
 };
 
-attributesIDom.checked = function (el, _name, value) {
-  return el.checked = !!value;
-};
-
 notificationsIDom.nodesDeleted = function (nodes) {
   return nodes.forEach(function (node) {
     return node && node._elementDetached && schedule(node._elementDetached);

@@ -42,10 +42,6 @@ attributesIDom.value = (el: HTMLFormElement, _name: string, value: any) => {
     return (el.value = value === null || typeof value === 'undefined' ? '' : value);
 };
 
-attributesIDom.checked = (el: HTMLFormElement, _name: string, value: any) => {
-    return (el.checked = !!value);
-};
-
 notificationsIDom.nodesDeleted = (nodes: HyperScriptNode[]) =>
     nodes.forEach(
         (node) => node && node._elementDetached && schedule(node._elementDetached as () => void)
