@@ -297,7 +297,7 @@ function render(_ref2) {
   event.preventDefault();
   setTitle({
     match: match,
-    path: setPath(target) || setPath(location),
+    path: setPath(target) || setPath(root.location),
     isPopState: event.type === 'popstate'
   });
   patch(document.getElementById(options.routerId || options.id || APP_ID), match.view());
@@ -416,7 +416,7 @@ function componentFactory(_ref) {
       var setState = function setState(newState) {
         schedule$1(function () {
           hooks.set(setStateHookIndex, newState);
-          patch(element, renderElement(props));
+          element && patch(element, renderElement(props));
         });
       };
 

@@ -35,7 +35,7 @@ export function componentFactory({
             const setState = (newState: S) => {
                 schedule(() => {
                     hooks.set(setStateHookIndex, newState);
-                    patch(element, renderElement(props));
+                    element && patch(element, renderElement(props));
                 });
             };
 
