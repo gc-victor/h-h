@@ -1,62 +1,51 @@
 # h-h
 
-Your tiny framework to create web interfaces.
+h-h is a micro-library (<2.5 KB) for creating user interfaces. It doesn't require compilation as it uses HyperScript as a template engine. Instead of using a Virtual DOM, it uses dom diff to update the DOM reducing the memory allocation and GC thrashing for incremental updates. Its hooks allow reactive updates and side effects with a small API. It can be used for Static Site Generation, Server-Side Rendering and Client-Side Rendering.
 
--   HyperScript as a template engine, allowing uses it directly in the browser, without any build tool. In the case that you want to use JSX, you can do it too.
--   Instead of using a virtual DOM, it uses [Incremental DOM](https://github.com/google/incremental-dom) that reduces memory allocation and GC thrashing for incremental updates.
--   Hooks allow composing state and side effects.
--   A simple router.
--   Has a small API, not much to learn.
--   Static Site Generator, Server-Side and Client-Side Rendering.
+## Key Features
+
+-   Micro-library <2.5 KB
+-   Without dependencies
+-   No compilation needed
+-   HyperScript as a template engine
+-   No Virtual DOM, uses dom-diff to update the DOM
+-   Reactive updates and side effects
+-   Small API, not much to learn
+-   Static Site Generator, Server-Side Rendering and Client-Side Rendering
+-   Plus, a tiny router
 
 ## Let's Play
 
 You can start using it without bundlers or compilers.
 
-[Demo CodeSandbox](https://codesandbox.io/s/zen-matsumoto-f756x).
+[Demo CodeSandbox](https://codesandbox.io/s/silly-frost-mp0pp).
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <script src="https://cdn.jsdelivr.net/npm/incremental-dom@0.7.0/dist/incremental-dom-min.js"></script>
         <script type="module">
             import {
                 app,
                 component,
                 h,
-            } from 'https://cdn.jsdelivr.net/gh/gc-victor/h-h/dist/h-h.esm.js';
+            } from 'https://cdn.jsdelivr.net/gh/gc-victor/h-h/dist/esm/index.js';
 
-            const todo = component(({ update }) => {
-                const [newTodo, setNewTodo] = update('');
-                const [todos, setTodo] = update([]);
+            const Counter = component(({ update }) => {
+                const [count, setCount] = update(0);
 
-                const onInput = (ev) => {
-                    const value = ev.target.value;
+                const add = (ev) => setCount(ev.target.value);
+                const increment = () => setCount(count() + 1);
+                const decrement = () => setCount(count() - 1);
 
-                    setNewTodo(value);
-                };
-                const addTodo = (ev) => {
-                    ev.preventDefault();
-                    setTodo([...todos, newTodo]);
-                    setNewTodo('');
-                };
-
-                return h('form', { onSubmit: addTodo }, [
-                    h('input', { type: 'text', onInput, value: newTodo }, []),
-                    h('button', { type: 'submit' }, ['Add']),
-                    h(
-                        'ul',
-                        {},
-                        todos.map((t) => h('li', {}, t))
-                    ),
+                return h('div', {}, [
+                    h('button', { onClick: increment }, ['+']),
+                    h('input', { key: 'input', type: 'number', onInput: add, value: count() }, []),
+                    h('button', { onClick: decrement }, ['-']),
                 ]);
             })();
 
-            app({
-                id: 'app',
-                view: () => h('main', { id: 'app' }, [todo()]),
-            });
+            app(document.getElementById('app'), Counter());
         </script>
     </head>
     <body>
@@ -67,78 +56,36 @@ You can start using it without bundlers or compilers.
 
 ## Installation
 
-You can use npm or yarn to install it.
+You can use pnpm, npm or yarn to install it.
 
 ```console
-npm install git+https://github.com/gc-victor/h-h.git#master
+npm install git+https://github.com/gc-victor/h-h.git#main
 ```
 
 Import it in your application.
 
 ```js
-import { h, component, app } from 'h-h';
+import { app, h, component } from 'h-h';
 ```
 
 Or import it in a `<script>` as a module.
 
 ```html
 <script type="module">
-    import { h, component, app } from 'https://cdn.jsdelivr.net/gh/gc-victor/h-h/dist/h-h.esm.js';
+    import { app, h, component } from 'https://cdn.jsdelivr.net/gh/gc-victor/h-h/dist/esm/index.js';
 </script>
 ```
 
-Or import it in a `<script>` as nomodule, and use it as a global variable.
+### Dependencies
 
-```html
-<script src="https://cdn.jsdelivr.net/gh/gc-victor/h-h/dist/h-h.umd.production.min.js"></script>
-```
-
-```javascript
-const { app, component, h } = window['h-h'];
-```
-
-### Dependecies
-
-Its main dependency is [Incremental DOM](https://github.com/google/incremental-dom), you have to import it with a CDN.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/incremental-dom@0.7.0/dist/incremental-dom-min.js"></script>
-```
-
-Or in your code.
+The only dependency is [html-element](https://github.com/1N50MN14/html-element) for Server Side Rendering or Static Site Generation.
 
 ```console
-npm install incremental-dom incremental-dom-string
+npm install html-element
 ```
 
-`incremental-dom.js` will be used for Client-Side Rendering.
-
 ```javascript
-import * as IncrementalDOMString from 'incremental-dom';
-
-window.IncrementalDOM = IncrementalDOM;
-```
-
-index.js
-
-```javascript
-import './incremental-dom';
-
-// Your code ...
-```
-
-`incremental-dom-string.js` will be used for Server-Side Rendering and Static Site Generator.
-
-```javascript
-import * as IncrementalDOMString from 'incremental-dom-string';
-
-global.IncrementalDOM = IncrementalDOM;
-```
-
-static.js
-
-```javascript
-import './incremental-dom-string';
+import 'html-element/global-shim';
 
 // Your code ...
 ```
@@ -148,86 +95,81 @@ import './incremental-dom-string';
 By default, you can use HyperScript. It doesn't require bundlers or compilers.
 
 ```javascript
-h('h1', {}, ['h-h']);
+h('h1', { className: 'bold' }, ['h-h']);
 ```
 
-To transpile JSX, you need a [Babel plugin](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx) that converts it to valid JavaScript.
-
-.babelrc
-
-```json
-{
-    "plugins": [
-        [
-            "@babel/plugin-transform-react-jsx",
-            {
-                "pragma": "h"
-            }
-        ]
-    ]
-}
-```
-
-index.js
+A key attribute is required to keep the focus of an active element when its content change.
 
 ```javascript
-/** @jsx h */
-import { app, h } from 'h-h';
-
-const todo = component(() => ... )();
-
-app({
-    id: 'app',
-    view: () => <main id="app">${todo()}</main>,
-});
+h('input', { key: 'input', value: newValue() }, []);
 ```
 
-## Hooks
-
-The hooks allow composing states and side effects in the components.
+To transpile JSX you can use [esbuild](https://esbuild.github.io/content-types/#jsx) or [Babel plugin](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx) to convert it to JavaScript.
 
 ```javascript
-const todo = component(({ created, deleted, execute, key, props, update }) => {
-    const [state, setter] = update('');
+import { app } from 'h-h';
 
-    created(() => {
-        console.log('CREATED');
-    });
-    deleted(() => {
-        console.log('DELETED');
-    });
+const App = component(() => {
+    return <h1 className="bold">h-h</h1>;
+})();
+
+app(document.getElementById('app'), App());
+```
+
+## Component
+
+h-h components provide isolated states to work with it and offer a small API to make it easy to learn.
+
+### API
+
+The injected hooks allow reactive updates and side effects for the components.
+
+```javascript
+const App = component(({ cleanup, execute, props, update }) => {
+    const [state, setState] = update('');
+
     execute(() => {
         console.log('EXECUTED ONCE');
     }, []);
     execute(() => {
         console.log('EXECUTED EACH TIME THE VARIABLE CHANGES');
     }, [variable]);
+    cleanup(() => {
+        console.log('cleanup');
+    });
 
-    return h('h1', null, ['h-h']);
+    return h('h1', {}, ['h-h']);
 });
 ```
 
--   **update**: as the useState from React is in charge of managing a state. It returns an array, where the first item is the current state, and the second is the setter.
--   **execute**: as the useEffect from React is the main way to trigger various side-effects.
--   **created**: is triggered when the component is created in the DOM, close to componentDidMount.
--   **deleted**: is triggered when the component is deleted from the DOM, close to componentWillUnMount.
+-   **cleanup**: is triggered when the component element is deleted from the DOM
+-   **execute**: is the main way to trigger side effects, you can use more than once in a single component
+-   **props**: are the properties used to send data from one component to another
+-   **update**: manages the component states, you can use more than once in a single component. It returns an array, where the first item is a function with the current state, and the second is the setter
+
+## App
+
+You can create as many apps as you need.
+
+```javascript
+app(document.getElementById('app'), App());
+```
 
 ## Router
 
 The router has to be initialized as part of the configuration of our application.
 
 ```javascript
-app({
-    id: 'app',
-    router: {
-        '/': {
-            title: () => 'View 1',
-            view: () => h('div', { id: 'app' }, ['View 1']),
-        },
-        '/:slug': {
-            title: () => 'View 2',
-            view: () => h('div', { id: 'app' }, ['View 2']),
-        },
+router({
+    '/': {
+        id: 'app', // by defaul the id is app
+        title: () => 'App 1',
+        view: () => h('div', {}, ['App 1']),
+    },
+    '/:slug': {
+        id: 'app2', // by defaul the id is app
+        title: () => 'App 2',
+        view: () => h('div', {}, ['App 2']),
     },
 });
 ```
@@ -235,12 +177,33 @@ app({
 To navigate through the application, you have to add the `to` method to an anchor.
 
 ```javascript
-import { to } from 'h-h';
+import { to } from 'h-h/router';
 ```
 
 ```javascript
 h('a', { href: '/', onClick: to }, ['View 1']);
 ```
+
+## Acknowledgments
+
+### Inspiration
+
+-   [React](https://reactjs.org/)
+-   [HyperScript](https://github.com/hyperhype/hyperscript)
+-   [HyperApp](https://github.com/jorgebucaran/hyperapp)
+-   [udomdiff](https://github.com/WebReflection/udomdiff)
+
+### Tools
+
+-   [esbuild](https://esbuild.github.io/)
+-   [gzip-size](https://esbuild.github.io/)
+-   [d-d](https://github.com/gc-victor/t-t)
+-   [esm](https://github.com/standard-things/esm) 
+-   [es-module-shims](https://github.com/guybedford/es-module-shims)
+-   [html-element](https://github.com/1N50MN14/html-element) 
+-   [jsdom](https://github.com/jsdom/jsdom)
+-   [t-t](https://github.com/gc-victor/t-t)
+-   [chokidar-cli](https://github.com/kimmobrunfeldt/chokidar-cli)
 
 ## Compatible Versioning
 
@@ -283,7 +246,7 @@ Pull requests are the greatest contributions, so be sure they are focused in sco
 -   Make your changes.
 -   `npm run build` to verify your change doesn't increase output size.
 -   `npm test` to make sure your change doesn't break anything.
--   Commit your changes: `git commit -am 'Add some feature'`
+-   Commit your changes: `git commit -am 'feat: add a feature'`
 -   Push to the branch: `git push origin my-new-feature`
 -   Submit a pull request with full remarks documenting your changes.
 
@@ -291,7 +254,7 @@ Pull requests are the greatest contributions, so be sure they are focused in sco
 
 [MIT License](https://github.com/gc-victor/h-h/blob/master/LICENSE)
 
-Copyright (c) 2020 Víctor García
+Copyright (c) 2021 Víctor García
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
